@@ -1,0 +1,26 @@
+{
+  "name": "cypressautomation",
+  "version": "1.0.0",
+  "description": "Pruebas automatizadas con cypress+pom+cucumber",
+  "main": "index.js",
+"scripts": {
+ "test:login": "cypress run --spec cypress/e2e/features/sauceLogin.feature"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderTincopa/CypressAutomation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AlexanderTincopa/CypressAutomation/issues"
+  },
+  "homepage": "https://github.com/AlexanderTincopa/CypressAutomation#readme",
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "cypress": "^15.17.0"
+  }
+}
