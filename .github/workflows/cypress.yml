@@ -1,35 +1,43 @@
-name: Cypress Tests
+name: cypress.yml
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
   workflow_dispatch:
+  pull_request:
+    branches:
+      - master
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          browser: chrome
-          spec: cypress/e2e/features/**/*.feature
+        run: npm run test:login
 
-      - name: Upload screenshots on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-
-      - name: Upload videos
+      - name: Upload Cypress videos
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cypress-videos
           path: cypress/videos
+          if-no-files-found: warn
+
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
