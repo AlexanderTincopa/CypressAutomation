@@ -8,6 +8,12 @@ const {
 } = require("@badeball/cypress-cucumber-preprocessor/esbuild");
 
 module.exports = defineConfig({
+  video: true,
+  videosFolder: "cypress/videos",
+  screenshotsFolder: "cypress/screenshots",
+  videoCompression: 32,
+  screenshotOnRunFailure: true,
+  
   e2e: {
     baseUrl: "https://www.saucedemo.com",
     specPattern: "cypress/e2e/features/**/*.feature",
