@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Pruebas automatizadas con cypress+pom+cucumber",
   "main": "index.js",
-"scripts": {
- "test:login": "cypress run --spec cypress/e2e/features/sauceLogin.feature"
-},
+  "scripts": {
+    "test:login": "cypress run --spec cypress/e2e/features/sauceLogin.feature",
+    "report:cucumber": "node scripts/generate-cucumber-report.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexanderTincopa/CypressAutomation.git"
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
-    "cypress": "^15.17.0"
+    "cypress": "^15.17.0",
+    "multiple-cucumber-html-reporter": "^3.9.3"
   }
 }
