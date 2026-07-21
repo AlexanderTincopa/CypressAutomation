@@ -5,6 +5,10 @@ Given("que ingreso a la página de login de SauceDemo", () => {
   sauceLoginPage.visitarPaginaLogin();
 });
 
+Given("que ingreso a la página de login de SauceDemo", () => {
+  sauceLoginPage.visitarPaginaLogin();
+});
+
 When("inicio sesión con usuario {string} y password {string}", (usuario, password) => {
   sauceLoginPage.iniciarSesion(usuario, password);
 });
