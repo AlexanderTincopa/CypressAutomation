@@ -1,18 +1,23 @@
 # Cypress Automation
 
-Suite de pruebas end-to-end para el flujo de autenticación de [SauceDemo](https://www.saucedemo.com). El proyecto combina Cypress, Cucumber/Gherkin y Page Object Model (POM), genera evidencias de ejecución y ejecuta las pruebas automáticamente en pull requests dirigidos a `master`.
+Suite de pruebas end-to-end para los flujos de autenticación, inventario y carrito de [SauceDemo](https://www.saucedemo.com). El proyecto combina Cypress, Cucumber/Gherkin y Page Object Model (POM), genera evidencias de ejecución y ejecuta una suite smoke automáticamente en pull requests dirigidos a `master`.
 
 ## Alcance actual
 
-La suite cubre tres escenarios de login:
+La suite contiene nueve escenarios:
 
-| Escenario | Usuario | Contraseña | Resultado esperado |
-|---|---|---|---|
-| Login exitoso | `standard_user` | `secret_sauce` | Navegación a `/inventory.html` y título `Products` visible |
-| Usuario bloqueado | `locked_out_user` | `secret_sauce` | Mensaje indicando que el usuario está bloqueado |
-| Credenciales inválidas | `standard_user` | `claveIncorrecta` | Mensaje indicando que usuario y contraseña no coinciden |
+| Área | Escenarios cubiertos |
+|---|---|
+| Login | Acceso exitoso, usuario bloqueado y credenciales inválidas |
+| Inventario | Cantidad disponible, orden por precio y detalle de producto |
+| Carrito | Agregar, visualizar y eliminar productos desde carrito o inventario |
 
 La aplicación bajo prueba se configura mediante `baseUrl` como `https://www.saucedemo.com`.
+
+Los escenarios se clasifican con:
+
+- `@smoke`: recorrido crítico de login, inventario y carrito.
+- `@regression`: conjunto funcional completo.
 
 ## Tecnologías
 
@@ -53,11 +58,20 @@ Step Definitions ──► Page Object ──► Aplicación SauceDemo
 ├── cypress
 │   ├── e2e
 │   │   ├── features
+│   │   │   ├── sauceCart.feature
+│   │   │   ├── sauceInventory.feature
 │   │   │   └── sauceLogin.feature
 │   │   ├── pages
+│   │   │   ├── sauceCart.js
+│   │   │   ├── sauceInventory.js
 │   │   │   └── sauceLogin.js
 │   │   └── step_definitions
+│   │       ├── sauceCartStep.js
+│   │       ├── sauceInventoryStep.js
 │   │       └── sauceLoginStep.js
+│   ├── fixtures
+│   │   ├── products.json
+│   │   └── users.json
 │   └── support
 │       ├── commands.js
 │       └── e2e.js
@@ -77,31 +91,34 @@ Step Definitions ──► Page Object ──► Aplicación SauceDemo
 
 #### Feature
 
-`cypress/e2e/features/sauceLogin.feature` contiene la especificación funcional en Gherkin. Cada escenario reutiliza Steps parametrizados para usuario, contraseña y mensajes de error.
+Los archivos de `cypress/e2e/features` contienen las especificaciones funcionales en Gherkin:
+
+- `sauceLogin.feature`: autenticación positiva y negativa.
+- `sauceInventory.feature`: listado, orden y detalle.
+- `sauceCart.feature`: alta, consulta y eliminación de productos.
+
+Los `Background` de inventario y carrito reutilizan el login configurado antes de cada escenario.
 
 #### Step Definitions
 
-`cypress/e2e/step_definitions/sauceLoginStep.js` conecta las frases Gherkin con el Page Object:
-
-| Step | Acción delegada |
-|---|---|
-| `Given que ingreso a la página...` | Abre la pantalla de login |
-| `When inicio sesión con usuario...` | Introduce credenciales y pulsa Login |
-| `Then debería visualizar la página...` | Valida URL y título de productos |
-| `Then debería visualizar el mensaje...` | Valida el mensaje de error recibido |
+Los archivos de `cypress/e2e/step_definitions` conectan Gherkin con los Page Objects. Los Steps reciben parámetros legibles, consultan fixtures cuando corresponde y delegan las interacciones; no contienen selectores de la interfaz.
 
 #### Page Object
 
-`cypress/e2e/pages/sauceLogin.js` centraliza:
+Los Page Objects centralizan:
 
-- Selectores `data-test` de usuario, contraseña, botón, error y título.
-- Apertura de la página raíz.
-- Escritura de credenciales.
-- Acción de login.
-- Validación de la página de inventario.
-- Validación de mensajes de error.
+- `sauceLogin.js`: autenticación y validación de errores.
+- `sauceInventory.js`: productos, ordenamiento, detalle y badge del carrito.
+- `sauceCart.js`: contenido del carrito y eliminación de productos.
 
-La instancia del Page Object se exporta para ser reutilizada por los Steps. Los escenarios no acceden directamente a selectores de la interfaz.
+Cada Page Object utiliza selectores `data-test` y exporta una instancia reutilizable. Los escenarios no acceden directamente a selectores de la interfaz.
+
+#### Fixtures
+
+- `users.json`: credenciales por tipo de usuario (`standard`, `locked` e `invalid`).
+- `products.json`: nombre, precio y descripción de los productos utilizados.
+
+Los fixtures evitan repetir datos técnicos en múltiples archivos y permiten validar que la clave solicitada por un Step exista.
 
 #### Support
 
@@ -136,7 +153,7 @@ npm install
 
 `npm install` instala las dependencias declaradas, actualiza el lockfile cuando corresponde y ejecuta `prepare`, que activa los hooks de Husky en el repositorio local.
 
-No es necesario crear un archivo `.env` para los escenarios actuales: la URL y los datos de prueba están definidos en la configuración y el feature.
+No es necesario crear un archivo `.env` para los escenarios actuales: la URL está en la configuración y los datos reutilizables están en `cypress/fixtures`.
 
 ## Configuración de Cypress
 
@@ -157,16 +174,32 @@ La configuración reside en `cypress.config.js`:
 
 ## Ejecución de pruebas
 
-### Suite de login en modo headless
+### Suite smoke
+
+```bash
+npm run test:smoke
+```
+
+Ejecuta los tres escenarios críticos etiquetados con `@smoke`.
+
+### Regresión completa
+
+```bash
+npm run test:regression
+```
+
+### Todas las pruebas
+
+```bash
+npm run test:all
+```
+
+### Ejecución por funcionalidad
 
 ```bash
 npm run test:login
-```
-
-Equivale a ejecutar Cypress sobre:
-
-```text
-cypress/e2e/features/sauceLogin.feature
+npm run test:inventory
+npm run test:cart
 ```
 
 ### Interfaz interactiva de Cypress
@@ -177,7 +210,7 @@ Para depuración local:
 npx cypress open
 ```
 
-Selecciona pruebas E2E y después `sauceLogin.feature`.
+Selecciona pruebas E2E y después la feature que quieras ejecutar.
 
 ### Flujo de una ejecución
 
@@ -207,7 +240,7 @@ Rutas utilizadas:
 | Capturas ante fallos | `cypress/screenshots/` |
 | Descargas | `cypress/downloads/` |
 
-El reporte muestra duración, nombre del proyecto, suite, framework y comando ejecutado. Actualmente sus metadatos descriptivos indican Chrome latest, Windows 11 y máquina local; son valores configurados en el generador, no detección dinámica del entorno.
+El reporte muestra duración, proyecto, suite, framework, comando, plataforma y contexto de ejecución. El sistema operativo se obtiene dinámicamente; CI identifica el runner de GitHub Actions y proporciona el nombre de la suite y el comando mediante variables de entorno.
 
 Las carpetas de reportes y evidencias están excluidas de Git mediante `.gitignore`.
 
@@ -215,7 +248,12 @@ Las carpetas de reportes y evidencias están excluidas de Git mediante `.gitigno
 
 | Comando | Descripción |
 |---|---|
+| `npm run test:all` | Ejecuta todas las features |
+| `npm run test:smoke` | Ejecuta escenarios con `@smoke` |
+| `npm run test:regression` | Ejecuta escenarios con `@regression` |
 | `npm run test:login` | Ejecuta la feature de login en modo headless |
+| `npm run test:inventory` | Ejecuta la feature de inventario |
+| `npm run test:cart` | Ejecuta la feature de carrito |
 | `npm run report:cucumber` | Genera el reporte HTML de Cucumber |
 | `npm run validate:steps` | Detecta Step Definitions duplicados |
 | `npm run prepare` | Inicializa Husky en el repositorio local |
@@ -295,7 +333,7 @@ El job `cypress-run` se ejecuta sobre Ubuntu y realiza:
 1. Checkout del repositorio.
 2. Configuración de Node.js 24 con caché de npm.
 3. Instalación reproducible con `npm ci`.
-4. Ejecución de `npm run test:login`.
+4. Ejecución de `npm run test:smoke`.
 5. Generación del reporte, incluso si las pruebas fallan.
 6. Creación de un resumen en GitHub Actions.
 7. Publicación de reportes JSON/HTML y videos.
@@ -317,7 +355,7 @@ Antes de publicar:
 
 ```bash
 npm run validate:steps
-npm run test:login
+npm run test:smoke
 git status
 git diff
 ```
@@ -381,7 +419,7 @@ Comprueba `git config --get core.hooksPath`. Si no devuelve `.husky/_`, ejecuta 
 - Utiliza Node.js 24.
 - Conserva `package-lock.json` actualizado.
 - Usa `npm ci` cuando quieras reproducir estrictamente las versiones del lockfile.
-- Recuerda que el runner de CI usa Ubuntu, aunque el reporte actualmente muestre metadatos estáticos de Windows.
+- Recuerda que el runner de CI usa Ubuntu y la ejecución local usa tu sistema operativo.
 
 ## Archivos que no deben versionarse
 

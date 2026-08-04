@@ -1,4 +1,7 @@
 const report = require("multiple-cucumber-html-reporter");
+const os = require("node:os");
+
+const isCI = process.env.GITHUB_ACTIONS === "true";
 
 report.generate({
   jsonDir: "reports/cucumber-json",
@@ -9,22 +12,25 @@ report.generate({
   openReportInBrowser: false,
   metadata: {
     browser: {
-      name: "chrome",
-      version: "latest",
+      name: process.env.CYPRESS_BROWSER || "Electron",
+      version: "Administrado por Cypress",
     },
-    device: "Local machine",
+    device: isCI ? "GitHub Actions runner" : "Local machine",
     platform: {
-      name: "windows",
-      version: "11",
+      name: os.platform(),
+      version: os.release(),
     },
   },
   customData: {
     title: "Información de ejecución",
     data: [
       { label: "Proyecto", value: "CypressAutomation" },
-      { label: "Suite", value: "SauceDemo Login" },
+      { label: "Suite", value: process.env.TEST_SUITE || "SauceDemo E2E" },
       { label: "Framework", value: "Cypress + Cucumber + POM" },
-      { label: "Comando", value: "npm run test:login" },
+      {
+        label: "Comando",
+        value: process.env.TEST_COMMAND || "Definido por la ejecución",
+      },
     ],
   },
 });
