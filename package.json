@@ -6,6 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "validate:steps": "node scripts/validate-steps.js",
+    "validate:branch": "node scripts/validate-branch-name.js",
     "test:all": "cypress run",
     "test:smoke": "cypress run --env tags=@smoke",
     "test:regression": "cypress run --env tags=@regression",
@@ -40,6 +41,8 @@
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "cypress": "^15.17.0",
     "husky": "^9.1.7",
     "multiple-cucumber-html-reporter": "^3.9.3"
