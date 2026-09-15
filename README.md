@@ -338,6 +338,12 @@ test: agregar escenario de carrito vacio
 
 Ambos hooks corren localmente igual que `pre-push`: requieren `npm install` (o `npm run prepare`) para activarse.
 
+## Skill de git-flow (Claude Code)
+
+Si usas [Claude Code](https://claude.com/claude-code) sobre este repo, `.claude/skills/git-flow/SKILL.md` automatiza el flujo completo: revisión del diff antes de subir cambios, verificación de la rama, redacción del mensaje en Conventional Commits, commit, push y creación del PR con `gh`. Los hooks de Husky siguen siendo la validación real (funcionan sin Claude Code); la skill agrega la revisión de contenido que un hook no puede hacer por sí solo.
+
+Requiere tener `gh` instalado y autenticado (`gh auth login`, una sola vez por máquina). La skill nunca hace merge ni push forzado por su cuenta — esas acciones requieren pedido explícito.
+
 ## Integración continua
 
 El workflow `.github/workflows/cypress.yml` se activa:
