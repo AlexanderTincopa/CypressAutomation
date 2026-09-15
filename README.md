@@ -321,6 +321,23 @@ npm run prepare
 
 La existencia de `.husky/pre-push` por sí sola no garantiza que Git esté usando el hook; `core.hooksPath` debe estar configurado.
 
+## Hooks de nomenclatura (rama y commit)
+
+Además del hook de pre-push, el repositorio valida dos convenciones antes de que un cambio llegue al historial:
+
+- `.husky/pre-commit` ejecuta `npm run validate:branch`, que rechaza el commit si la rama activa no sigue el formato `usuario/descripcion-cambio` (por ejemplo `atincopa/add-login-test`). Las ramas `master`, `main` y el estado `HEAD` desprendido están exentas.
+- `.husky/commit-msg` ejecuta `commitlint`, que exige el formato [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`, etc.). La configuración está en `commitlint.config.js`.
+
+Ejemplos de mensajes válidos:
+
+```text
+feat: agregar validacion de login con credenciales invalidas
+fix: corregir selector del boton de checkout
+test: agregar escenario de carrito vacio
+```
+
+Ambos hooks corren localmente igual que `pre-push`: requieren `npm install` (o `npm run prepare`) para activarse.
+
 ## Integración continua
 
 El workflow `.github/workflows/cypress.yml` se activa:
@@ -364,11 +381,11 @@ Añade únicamente los archivos esperados, crea el commit y publica la rama:
 
 ```bash
 git add <archivos>
-git commit -m "Descripción del cambio"
+git commit -m "tipo: descripción del cambio"
 git push -u origin usuario/descripcion-cambio
 ```
 
-Husky repetirá la validación de Steps durante el push. Cuando la rama esté lista, crea un pull request hacia `master`; GitHub Actions ejecutará la suite.
+El `tipo` del commit debe seguir [Conventional Commits](https://www.conventionalcommits.org/) (`feat`, `fix`, `docs`, `test`, `chore`, `refactor`, etc.); `commit-msg` lo valida automáticamente. Husky repetirá la validación de Steps durante el push. Cuando la rama esté lista, crea un pull request hacia `master`; GitHub Actions ejecutará la suite.
 
 ## Cómo ampliar la suite
 
