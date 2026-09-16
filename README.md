@@ -451,3 +451,5 @@ Comprueba `git config --get core.hooksPath`. Si no devuelve `.husky/_`, ejecuta 
 ## Licencia
 
 El proyecto declara licencia ISC en `package.json`.
+
+##
