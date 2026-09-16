@@ -338,11 +338,20 @@ test: agregar escenario de carrito vacio
 
 Ambos hooks corren localmente igual que `pre-push`: requieren `npm install` (o `npm run prepare`) para activarse.
 
-## Skill de git-flow (Claude Code)
+## Automatización de git/GitHub con Claude Code
 
-Si usas [Claude Code](https://claude.com/claude-code) sobre este repo, `.claude/skills/git-flow/SKILL.md` automatiza el flujo completo: revisión del diff antes de subir cambios, verificación de la rama, redacción del mensaje en Conventional Commits, commit, push y creación del PR con `gh`. Los hooks de Husky siguen siendo la validación real (funcionan sin Claude Code); la skill agrega la revisión de contenido que un hook no puede hacer por sí solo.
+Si usas [Claude Code](https://claude.com/claude-code), el flujo de commit/push/PR está cubierto por dos piezas:
 
-Requiere tener `gh` instalado y autenticado (`gh auth login`, una sola vez por máquina). La skill nunca hace merge ni push forzado por su cuenta — esas acciones requieren pedido explícito.
+1. **Plugin `git-flow`** (compartido entre todos los repos del equipo, vive en [AlexanderTincopa/claude-plugins](https://github.com/AlexanderTincopa/claude-plugins)): revisión del diff antes de subir cambios, verificación de la rama, redacción del mensaje de commit, push y creación del PR con `gh`. Se instala una vez por persona:
+   ```
+   /plugin marketplace add AlexanderTincopa/claude-plugins
+   /plugin install git-flow@claude-plugins
+   ```
+2. **Skill de proyecto `.claude/skills/repo-conventions/SKILL.md`** (versionada en este repo, no requiere instalación): documenta lo específico de CypressAutomation — el patrón de rama, los hooks de Husky/commitlint y qué archivos nunca deben subirse. Se combina automáticamente con el plugin.
+
+Los hooks de Husky siguen siendo la validación real (funcionan sin Claude Code, con o sin el plugin instalado); estas dos piezas agregan la revisión de contenido y el criterio que un hook no puede aplicar por sí solo.
+
+Requiere tener `gh` instalado y autenticado (`gh auth login`, una sola vez por máquina). Ni el plugin ni la skill hacen merge ni push forzado por su cuenta — esas acciones siempre requieren pedido explícito.
 
 ## Integración continua
 
